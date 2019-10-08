@@ -1,0 +1,7 @@
+{
+  "region": "us-west-2",
+  "enpoint" :"https://dynamodb.us-west-2.amazonaws.com",
+  "tableName" : "MOVIES5",
+  "accessKeyId": "AKIAUALTA7JKB2RIGA7F",
+  "secretAccessKey": "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"
+}
