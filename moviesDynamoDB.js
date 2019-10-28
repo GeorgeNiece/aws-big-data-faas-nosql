@@ -99,14 +99,14 @@ function handler(event, context, callback) {
 	if(typeof event === 'string')
 		event = JSON.parse(event);
 
-	//logInput(event);
+	logInput(event);
 
 	// strip any leading slashes including the /movies/
 	//if (event.resourcePath.charAt(0) == "/")
 	var marker = event.resourcePath.lastIndexOf("/");
 	
 	var resource = event.resourcePath.substr(marker+1);
-
+	console.log(resource);
 	// switch for handling paths
 	switch (resource) {
 
@@ -132,7 +132,7 @@ function handler(event, context, callback) {
 		findByRating(rating, tableName);
 		break;
 	default:
-		notyet();
+		notYet();
 	}
 	
 	console.log('responseData: ' +JSON.stringify(responseData));
@@ -194,8 +194,8 @@ function listItems(tableName) {
 				"#yr" : "year",
 			},
 			ExpressionAttributeValues : {
-				":start_yr" : 1950,
-				":end_yr" : 2999
+				":start_yr" : 2000,
+				":end_yr" : 2001
 			}
 	};
 	
@@ -220,7 +220,7 @@ function addMovie(item, tableName) {
 
 	var movie = item;
 
-	// console.log('title: ' + movie.title);
+	console.log('title: ' + movie.title);
 
 	var params = {
 			TableName : tableName,
@@ -362,57 +362,4 @@ function testLambda() {
 	return notYet();
 }
 
-/**
- * createTable - This async function runs at initialization of the lambda
- * function and ensures that the table exists.
- * 
- * 
- * 
- */
 
-async.series([ function createMoviesTable(callback) {
-	// console.log('createTable');
-	var params = {
-			// TableName : "Movies",
-			TableName : config.tableName,
-			KeySchema : [ {
-				AttributeName : "year",
-				KeyType : "HASH"
-			}, // Partition key
-			{
-				AttributeName : "title",
-				KeyType : "RANGE"
-			} // Sort key
-			],
-			AttributeDefinitions : [ {
-				AttributeName : "year",
-				AttributeType : "N"
-			}, {
-				AttributeName : "title",
-				AttributeType : "S"
-			} ],
-			ProvisionedThroughput : {
-				ReadCapacityUnits : 100,
-				WriteCapacityUnits : 100
-			}
-	};
-
-	console.log('Checking if table exists: ' + config.tableName + ' in '
-			+ AWS.config.region);
-	dynamodb.createTable(params, callback);
-} ], function(err, results) {
-	if (err) {
-		if (err.message.indexOf('Table already exists') != -1) {
-			// console.log('table found!');
-			console.log(err.message);
-			init();
-			// console.log(err.message);
-		} else {
-			// console.log(err);
-			throw err;
-		}
-	} else {
-		console.log('Database initialization complete.');
-		init();
-	}
-});
